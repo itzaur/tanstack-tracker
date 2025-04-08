@@ -23,6 +23,7 @@ import { format } from 'date-fns';
 import { Calendar } from './ui/calendar';
 import { cn } from '@/lib/utils';
 import { Input } from './ui/input';
+import { categoriesTable } from '@/db/schema';
 
 const transactionFormSchema = z.object({
   transactionType: z.enum(['income', 'expense']),
@@ -37,7 +38,11 @@ const transactionFormSchema = z.object({
     .max(300, 'Description must contain a maximum of 300 characters'),
 });
 
-export default function TransactionForm() {
+export default function TransactionForm({
+  categories,
+}: {
+  categories: (typeof categoriesTable.$inferSelect)[];
+}) {
   const form = useForm<z.infer<typeof transactionFormSchema>>({
     resolver: zodResolver(transactionFormSchema),
     defaultValues: {
@@ -52,6 +57,10 @@ export default function TransactionForm() {
   const handleSubmit = (data: z.infer<typeof transactionFormSchema>) => {
     console.log({ data });
   };
+
+  const filteredCategories = categories.filter(
+    (category) => category.type === form.getValues('transactionType')
+  );
 
   return (
     <Form {...form}>
@@ -99,7 +108,16 @@ export default function TransactionForm() {
                       <SelectTrigger>
                         <SelectValue placeholder='Category' />
                       </SelectTrigger>
-                      <SelectContent></SelectContent>
+                      <SelectContent>
+                        {filteredCategories.map((category) => (
+                          <SelectItem
+                            key={category.id}
+                            value={category.id.toString()}
+                          >
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
                     </Select>
                   </FormControl>
                   <FormMessage />
