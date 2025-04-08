@@ -29,6 +29,7 @@ import poppins600 from '@fontsource/poppins/600.css?url';
 import poppins700 from '@fontsource/poppins/700.css?url';
 import poppins800 from '@fontsource/poppins/800.css?url';
 import poppins900 from '@fontsource/poppins/900.css?url';
+import { Toaster } from '@/components/ui/sonner';
 
 export const Route = createRootRoute({
   notFoundComponent() {
@@ -172,6 +173,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
             </div>
           </nav>
           {children}
+          <Toaster richColors />
           <Scripts />
         </body>
       </html>

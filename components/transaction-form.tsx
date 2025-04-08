@@ -65,7 +65,7 @@ export default function TransactionForm({
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <fieldset
           disabled={form.formState.isSubmitting}
-          className='grid grid-cols-2 gap-y-5 gap-x-2'
+          className='grid grid-cols-2 gap-y-5 gap-x-2 items-start'
         >
           <FormField
             control={form.control}

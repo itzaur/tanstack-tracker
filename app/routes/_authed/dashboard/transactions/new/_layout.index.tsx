@@ -1,19 +1,13 @@
 import TransactionForm, {
   transactionFormSchema,
 } from '@/components/transaction-form';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { createTransaction } from '@/data/createTransaction';
 import { getCategories } from '@/data/getCategories';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { format } from 'date-fns';
 import { z } from 'zod';
+import { toast } from 'sonner';
 
 export const Route = createFileRoute(
   '/_authed/dashboard/transactions/new/_layout/'
@@ -28,6 +22,7 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
   const { categories } = Route.useLoaderData();
+  const navigate = useNavigate();
 
   const handleSubmit = async (data: z.infer<typeof transactionFormSchema>) => {
     console.log('HANDLE SUBMIT: ', { data });
@@ -38,6 +33,16 @@ function RouteComponent() {
         categoryId: data.categoryId,
         description: data.description,
         transactionDate: format(data.transactionDate, 'yyy-MM-dd'),
+      },
+    });
+
+    toast.success('Transaction created');
+
+    navigate({
+      to: '/dashboard/transactions',
+      search: {
+        month: data.transactionDate.getMonth() + 1,
+        year: data.transactionDate.getFullYear(),
       },
     });
 
