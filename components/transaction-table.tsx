@@ -11,6 +11,7 @@ import { Badge } from './ui/badge';
 import numeral from 'numeral';
 import { Button } from './ui/button';
 import { PencilIcon } from 'lucide-react';
+import { Link, useRouter } from '@tanstack/react-router';
 
 export default function TransactionTable({
   transactions,
@@ -24,7 +25,7 @@ export default function TransactionTable({
     transactionType: 'income' | 'expense' | null;
   }[];
 }) {
-  console.log('TRANSACTIONS: ', { transactions });
+  const router = useRouter();
 
   return (
     <Table className='mt-4'>
@@ -65,8 +66,21 @@ export default function TransactionTable({
                 variant='outline'
                 size='icon'
                 aria-label='Edit transaction'
+                asChild
               >
-                <PencilIcon />
+                <Link
+                  onClick={() => {
+                    router.clearCache({
+                      filter: (route) =>
+                        route.pathname !==
+                        `/dashboard/transactions/${transaction.id}`,
+                    });
+                  }}
+                  to={`/dashboard/transactions/$transactionId`}
+                  params={{ transactionId: String(transaction.id) }}
+                >
+                  <PencilIcon />
+                </Link>
               </Button>
             </TableCell>
           </TableRow>

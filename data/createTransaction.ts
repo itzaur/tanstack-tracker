@@ -5,7 +5,7 @@ import { createServerFn } from '@tanstack/start';
 import { addDays } from 'date-fns';
 import { z } from 'zod';
 
-const transactionSchema = z.object({
+export const transactionSchema = z.object({
   categoryId: z.coerce.number().positive('Please select a category'),
   transactionDate: z.string().refine((value) => {
     const parsedDate = new Date(value);
