@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Form,
   FormControl,
@@ -18,10 +18,10 @@ import {
 } from './ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Button } from './ui/button';
+import { cn } from '@/lib/utils';
 import { CalendarIcon } from 'lucide-react';
 import { addDays, format } from 'date-fns';
 import { Calendar } from './ui/calendar';
-import { cn } from '@/lib/utils';
 import { Input } from './ui/input';
 import { categoriesTable } from '@/db/schema';
 
@@ -30,7 +30,7 @@ export const transactionFormSchema = z.object({
   categoryId: z.coerce.number().positive('Please select a category'),
   transactionDate: z
     .date()
-    .max(addDays(new Date(), 1), 'Transaction cannot be in the future'),
+    .max(addDays(new Date(), 1), 'Transaction date cannot be in the future'),
   amount: z.coerce.number().positive('Amount must be greater than 0'),
   description: z
     .string()
@@ -38,12 +38,20 @@ export const transactionFormSchema = z.object({
     .max(300, 'Description must contain a maximum of 300 characters'),
 });
 
-export default function TransactionForm({
+export function TransactionForm({
   categories,
   onSubmit,
+  defaultValues,
 }: {
   categories: (typeof categoriesTable.$inferSelect)[];
   onSubmit: (data: z.infer<typeof transactionFormSchema>) => Promise<void>;
+  defaultValues?: {
+    transactionType: 'income' | 'expense';
+    amount: number;
+    categoryId: number;
+    description: string;
+    transactionDate: Date;
+  };
 }) {
   const form = useForm<z.infer<typeof transactionFormSchema>>({
     resolver: zodResolver(transactionFormSchema),
@@ -51,13 +59,14 @@ export default function TransactionForm({
       transactionType: 'income',
       amount: 0,
       categoryId: 0,
-      transactionDate: new Date(),
       description: '',
+      transactionDate: new Date(),
+      ...defaultValues,
     },
   });
 
   const filteredCategories = categories.filter(
-    (category) => category.type === form.getValues('transactionType')
+    (category) => category.type === form.watch('transactionType')
   );
 
   return (
@@ -77,7 +86,7 @@ export default function TransactionForm({
                   <FormControl>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger>
-                        <SelectValue placeholder='Transaction Type' />
+                        <SelectValue placeholder='Transaction type' />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value='income'>Income</SelectItem>
@@ -90,7 +99,6 @@ export default function TransactionForm({
               );
             }}
           />
-
           <FormField
             control={form.control}
             name='categoryId'
@@ -123,7 +131,6 @@ export default function TransactionForm({
               );
             }}
           />
-
           <FormField
             control={form.control}
             name='transactionDate'
@@ -141,7 +148,7 @@ export default function TransactionForm({
                             !field.value && 'text-muted-foreground'
                           )}
                         >
-                          <CalendarIcon />
+                          <CalendarIcon className='mr-2 h-4 w-4' />
                           {field.value ? (
                             format(field.value, 'PPP')
                           ) : (
@@ -149,7 +156,7 @@ export default function TransactionForm({
                           )}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className='w-auto p-0' align='start'>
+                      <PopoverContent className='w-auto p-0'>
                         <Calendar
                           mode='single'
                           selected={field.value}
@@ -167,7 +174,6 @@ export default function TransactionForm({
               );
             }}
           />
-
           <FormField
             control={form.control}
             name='amount'

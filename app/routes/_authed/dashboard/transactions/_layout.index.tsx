@@ -29,6 +29,7 @@ export const Route = createFileRoute(
   validateSearch: searchSchema,
   loaderDeps({ search }) {
     const today = new Date();
+
     return {
       month: search.month ?? today.getMonth() + 1,
       year: search.year ?? today.getFullYear(),
@@ -54,5 +55,12 @@ function RouteComponent() {
 
   console.log({ transactions });
 
-  return <AllTransactions month={month} year={year} yearsRange={yearsRange} />;
+  return (
+    <AllTransactions
+      month={month}
+      year={year}
+      yearsRange={yearsRange}
+      transactions={transactions}
+    />
+  );
 }

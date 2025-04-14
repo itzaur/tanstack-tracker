@@ -1,4 +1,4 @@
-import { createServerFn } from '@tanstack/react-start';
+import { createServerFn } from '@tanstack/start';
 import authMiddleware from '@/authMiddleware';
 import { db } from '@/db';
 import { categoriesTable, transactionsTable } from '@/db/schema';
