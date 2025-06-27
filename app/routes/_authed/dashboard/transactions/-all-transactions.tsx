@@ -12,6 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Link } from '@tanstack/react-router';
 import TransactionTable from '@/components/transaction-table';
 
+const MONTHS_IN_YEAR = 12;
+
 export default function AllTransactions({
   month,
   year,
@@ -49,7 +51,7 @@ export default function AllTransactions({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className='bg-popover translate-y-10 border-2 border-popover rounded-md shadow-lg z-1'>
-                {Array.from({ length: 12 }, (_, i) => (
+                {Array.from({ length: MONTHS_IN_YEAR }, (_, i) => (
                   <SelectItem key={i} value={`${i + 1}`}>
                     {format(new Date(selectedDate.getFullYear(), i, 1), 'MMM')}
                   </SelectItem>
