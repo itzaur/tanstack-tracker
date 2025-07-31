@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 import { Value } from '@radix-ui/react-select';
 import { useNavigate } from '@tanstack/react-router';
 import { format } from 'date-fns';
@@ -26,6 +27,16 @@ export function Cashflow({
   year: number;
   annualCashflow: { month: number; income: number; expenses: number }[];
 }) {
+  const totalAnnualIncome = annualCashflow.reduce(
+    (acc, { income }) => acc + income,
+    0
+  );
+  const totalAnnualExpenses = annualCashflow.reduce(
+    (acc, { expenses }) => acc + expenses,
+    0
+  );
+  const balance = totalAnnualIncome + totalAnnualExpenses;
+
   const navigate = useNavigate();
 
   return (
@@ -59,7 +70,7 @@ export function Cashflow({
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className='grid grid-cols-[1fr_250px]'>
         <ChartContainer
           config={{
             income: {
@@ -107,6 +118,39 @@ export function Cashflow({
             <Bar dataKey='expenses' fill='var(--color-expenses)' radius={4} />
           </BarChart>
         </ChartContainer>
+        <div className='border-l px-4 flex flex-col gap-4 justify-center'>
+          <div>
+            <span className='text-muted-foreground font-bold text-sm'>
+              Income
+            </span>
+            <h2 className='text-3xl'>
+              ${numeral(totalAnnualIncome).format('0,0[.]00')}
+            </h2>
+          </div>
+          <div className='border-t' />
+          <div>
+            <span className='text-muted-foreground font-bold text-sm'>
+              Expenses
+            </span>
+            <h2 className='text-3xl'>
+              ${numeral(totalAnnualExpenses).format('0,0[.]00')}
+            </h2>
+          </div>
+          <div className='border-t' />
+          <div>
+            <span className='text-muted-foreground font-bold text-sm'>
+              Balance
+            </span>
+            <h2
+              className={cn(
+                'text-3xl font-bold',
+                balance >= 0 ? 'text-lime-500' : 'text-orange-500'
+              )}
+            >
+              ${numeral(balance).format('0,0[.]00')}
+            </h2>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
