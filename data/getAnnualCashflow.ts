@@ -40,7 +40,7 @@ export const getAnnualCashflow = createServerFn({
     const annualCashflow: {
       month: number;
       income: number;
-      expense: number;
+      expenses: number;
     }[] = [];
 
     for (let i = 1; i <= MONTHS_IN_YEAR; i++) {
@@ -49,7 +49,7 @@ export const getAnnualCashflow = createServerFn({
       annualCashflow.push({
         month: i,
         income: +(monthlyCashflow?.totalIncome ?? 0),
-        expense: +(monthlyCashflow?.totalExpense ?? 0),
+        expenses: +(monthlyCashflow?.totalExpense ?? 0),
       });
     }
 
