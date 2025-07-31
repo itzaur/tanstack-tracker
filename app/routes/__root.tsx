@@ -32,6 +32,10 @@ import poppins900 from '@fontsource/poppins/900.css?url';
 import { Toaster } from '@/components/ui/sonner';
 
 export const Route = createRootRoute({
+  pendingMs: 0,
+  pendingComponent: () => (
+    <div className='grid place-items-center'>Loading...</div>
+  ),
   notFoundComponent() {
     return (
       <div className='text-3xl text-center py-10 text-muted-foreground'>
