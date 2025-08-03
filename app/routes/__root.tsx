@@ -1,11 +1,24 @@
-// app/routes/__root.tsx
 import type { ReactNode } from 'react';
+import { ChartColumnBigIcon } from 'lucide-react';
 import {
   Outlet,
   createRootRoute,
   HeadContent,
   Scripts,
+  Link,
+  useNavigate,
 } from '@tanstack/react-router';
+import {
+  ClerkProvider,
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  SignUpButton,
+  UserButton,
+} from '@clerk/tanstack-start';
+import { Button } from '@/components/ui/button';
+import { getSignedInUserId } from '@/data/getSignedInUserId';
+
 import appCss from '@/app/styles/globals.css?url';
 import poppins100 from '@fontsource/poppins/100.css?url';
 import poppins200 from '@fontsource/poppins/200.css?url';
@@ -16,8 +29,25 @@ import poppins600 from '@fontsource/poppins/600.css?url';
 import poppins700 from '@fontsource/poppins/700.css?url';
 import poppins800 from '@fontsource/poppins/800.css?url';
 import poppins900 from '@fontsource/poppins/900.css?url';
+import { Toaster } from '@/components/ui/sonner';
 
 export const Route = createRootRoute({
+  pendingMs: 0,
+  pendingComponent: () => (
+    <div className='grid place-items-center'>Loading...</div>
+  ),
+  notFoundComponent() {
+    return (
+      <div className='text-3xl text-center py-10 text-muted-foreground'>
+        Oops! Page not found
+      </div>
+    );
+  },
+  beforeLoad: async () => {
+    const userId = await getSignedInUserId();
+
+    return { userId };
+  },
   head: () => ({
     meta: [
       {
@@ -86,15 +116,74 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
+  const navigate = useNavigate();
+
   return (
-    <html>
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
-    </html>
+    <ClerkProvider>
+      <html>
+        <head>
+          <HeadContent />
+        </head>
+        <body>
+          <nav className='bg-primary p-4 h-20 text-white flex items-center justify-between'>
+            <Link to='/' className='flex gap-1 items-center font-bold text-2xl'>
+              <ChartColumnBigIcon className='text-lime-500' />
+              TanTracker
+            </Link>
+            <div>
+              <SignedOut>
+                <div className='flex text-white items-center'>
+                  <Button
+                    asChild
+                    variant='link'
+                    className='text-white cursor-pointer'
+                  >
+                    <SignInButton />
+                  </Button>
+                  <div className='w-[1px] h-8 bg-zinc-700' />
+                  <Button
+                    asChild
+                    variant='link'
+                    className='text-white cursor-pointer'
+                  >
+                    <SignUpButton />
+                  </Button>
+                </div>
+              </SignedOut>
+              <SignedIn>
+                <UserButton
+                  showName
+                  appearance={{
+                    elements: {
+                      userButtonAvatarBox: {
+                        border: '1px solid white',
+                      },
+                      userButtonOuterIdentifier: {
+                        color: 'white',
+                      },
+                    },
+                  }}
+                >
+                  <UserButton.MenuItems>
+                    <UserButton.Action
+                      label='Dashboard'
+                      labelIcon={<ChartColumnBigIcon size={16} />}
+                      onClick={() => {
+                        navigate({
+                          to: '/dashboard',
+                        });
+                      }}
+                    />
+                  </UserButton.MenuItems>
+                </UserButton>
+              </SignedIn>
+            </div>
+          </nav>
+          {children}
+          <Toaster richColors />
+          <Scripts />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
